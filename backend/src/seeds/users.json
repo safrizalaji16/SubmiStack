@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Super Admin",
+    "email": "superAdmin@mail.com",
+    "password": "superAdmin@123",
+    "role": "superAdmin"
+  },
+  {
+    "name": "Admin",
+    "email": "admin@mail.com",
+    "password": "admin@123",
+    "role": "admin"
+  },
+  {
+    "name": "User",
+    "email": "user@mail.com",
+    "password": "user@123",
+    "role": "user"
+  }
+]
