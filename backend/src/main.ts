@@ -20,8 +20,10 @@ async function bootstrap() {
     .setTitle('SubmiStack API')
     .setDescription('The SubmiStack API description')
     .setVersion('1.0')
-    .addTag('auth')
-    .addTag('user')
+    .addTag('Auth')
+    .addTag('User')
+    .addTag('Submission')
+    .addTag('File')
     .build();
 
   const options: SwaggerDocumentOptions = {

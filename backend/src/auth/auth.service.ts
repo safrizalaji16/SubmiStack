@@ -75,4 +75,23 @@ export class AuthService {
             token: token,
         };
     }
+
+    async me(id: string): Promise<UserDto> {
+        this.logger.debug(`Get user ${id}`);
+
+        const user = await this.prismaService.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) {
+            throw new HttpException('User not found', 404);
+        }
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        }
+    }
 }

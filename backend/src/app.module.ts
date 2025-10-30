@@ -9,9 +9,11 @@ import { CommonModule } from './common/common.module';
 import { LogMiddleware } from './middlewares/log.middleware';
 import { AuthMiddleware, IsOwnerMiddleware } from './middlewares/auth.middleware';
 import { AuthModule } from './auth/auth.module';
+import { SubmissionModule } from './submission/submission.module';
+import { FileModule } from './file/file.module';
 
 @Module({
-  imports: [CommonModule, UserModule, AuthModule],
+  imports: [CommonModule, UserModule, AuthModule, SubmissionModule, FileModule],
   providers: [LogMiddleware, AuthMiddleware],
 })
 export class AppModule implements NestModule {

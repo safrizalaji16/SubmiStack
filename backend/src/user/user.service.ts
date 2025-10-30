@@ -1,8 +1,8 @@
 import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
-import { Role } from '@prisma/client';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
-import { UserDto } from 'src/dto/request/user.dto';
+import { UpdateUserDto, UserDto, UserQuery } from 'src/dto/request/user.dto';
+import { hashPassword } from 'src/helpers/bcrypt';
 
 @Injectable()
 export class UserService {
@@ -11,13 +11,20 @@ export class UserService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) { }
 
-  async getUsers(role: Role[]): Promise<UserDto[]> {
+  async getUsers(query: UserQuery): Promise<UserDto[]> {
     this.logger.debug(`Get users`);
 
     const whereClause = {};
 
-    if (role && role.length > 0) {
-      whereClause['role'] = { in: role };
+    if (query.search) {
+      whereClause['OR'] = [
+        { name: { contains: query.search } },
+        { email: { contains: query.search } },
+      ];
+    }
+
+    if (query.role) {
+      whereClause['role'] = { in: query.role };
     }
 
     const users = await this.prismaService.user.findMany({
@@ -37,9 +44,114 @@ export class UserService {
     }
 
     return users.map((user) => ({
+      id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
     }));
+  }
+
+  async getUser(id: string): Promise<UserDto> {
+    this.logger.debug(`Get user ${id}`);
+
+    const user = await this.prismaService.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    }
+  }
+
+  async createUser(user: UserDto): Promise<UserDto> {
+    this.logger.debug(`Create user ${JSON.stringify(user)}`);
+
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { email: user.email },
+    });
+
+    if (existingUser) {
+      throw new HttpException('email or name already exists', 400);
+    }
+
+    const createdUser = await this.prismaService.user.create({
+      data: {
+        name: user.name,
+        email: user.email,
+        password: await hashPassword(user.password),
+        role: user.role,
+      },
+    })
+
+    return {
+      id: createdUser.id,
+      name: createdUser.name,
+      email: createdUser.email,
+      role: createdUser.role,
+    };
+  }
+
+  async updateUser(id: string, user: UpdateUserDto): Promise<UserDto> {
+    this.logger.debug(`Update user ${id}`);
+
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id },
+      data: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+
+    return ({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role
+    })
+  }
+
+  async deleteUser(id: string): Promise<UserDto> {
+    this.logger.debug(`Delete user ${id}`);
+
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const deletedUser = await this.prismaService.user.delete({
+      where: { id },
+    });
+
+    return ({
+      id: deletedUser.id,
+      name: deletedUser.name,
+      email: deletedUser.email,
+      role: deletedUser.role
+    })
   }
 }

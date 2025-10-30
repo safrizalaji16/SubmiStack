@@ -46,7 +46,8 @@ model Submission {
   name      String          @db.VarChar(100)
   email     String          @db.VarChar(100)
   phone     String          @db.VarChar(20)
-  imageUrl  String?         @db.VarChar(255)
+  imageId   String?         @unique @db.Uuid
+  image     Image?          @relation(fields: [imageId], references: [id])
   logs      SubmissionLog[]
   createdAt DateTime        @default(now())
   updatedAt DateTime        @default(now()) @updatedAt
@@ -64,4 +65,16 @@ model SubmissionLog {
   timestamp    DateTime   @default(now())
 
   @@map("submission_logs")
+}
+
+model Image {
+  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  path       String      @db.VarChar(255)
+  fileName   String      @map("file_name") @db.VarChar(255)
+  url        String      @db.VarChar(500)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  submission Submission?
+
+  @@map("images")
 }
