@@ -84,7 +84,7 @@ export class UserService {
     });
 
     if (existingUser) {
-      throw new HttpException('email or name already exists', 400);
+      throw new HttpException('email already exists', 400);
     }
 
     const createdUser = await this.prismaService.user.create({

@@ -86,12 +86,17 @@ export class AuthController {
         },
     })
     async login(
+        @Req() req: Request,
         @Res({ passthrough: true }) res: Response,
         @Body() loginUserDto: LoginUserDto
     ): Promise<ResponseDto<LoginRes>> {
         const user = await this.authService.login(loginUserDto);
 
-        res.cookie('JWT', user.token);
+        res.cookie('JWT', user.token, {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/',
+        });
 
         return {
             message: 'User logged in successfully',
@@ -127,6 +132,56 @@ export class AuthController {
         return {
             message: 'User retrieved successfully',
             data: await this.authService.me(id),
+            errors: null
+        }
+    }
+
+    @Post('/admin/login')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Login a user' })
+    @ApiBody({ type: LoginUserDto })
+    @ApiResponse({
+        status: 200,
+        description: 'User logged in successfully',
+        schema: {
+            example: {
+                message: 'User logged in successfully',
+                data: {
+                    id: '00000000-0000-0000-0000-000000000000',
+                    name: 'test',
+                    email: 'test@mail.com',
+                    role: 'user',
+                },
+                errors: null,
+            },
+        },
+    })
+    async adminLogin(@Body() loginUserDto: LoginUserDto) {
+        return this.authService.login(loginUserDto);
+    }
+
+    @Get('/logout')
+    @HttpCode(200)
+    @ApiOperation({ summary: 'Logout a user' })
+    @ApiResponse({
+        status: 200,
+        description: 'User logged out successfully',
+        schema: {
+            example: {
+                message: 'User logged out successfully',
+                data: null,
+                errors: null,
+            },
+        },
+    })
+    async logout(
+        @Res({ passthrough: true }) res: Response
+    ): Promise<ResponseDto<UserDto>> {
+        res.clearCookie('JWT');
+
+        return {
+            message: 'User logged out successfully',
+            data: null,
             errors: null
         }
     }

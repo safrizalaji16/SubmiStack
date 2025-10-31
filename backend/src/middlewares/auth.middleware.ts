@@ -14,6 +14,7 @@ export class AuthMiddleware
   async use(req: Request, res: Response, next: (error?: any) => void) {
     const cookies = req.cookies;
     let token = cookies['JWT'] as string;
+    console.log(cookies, token, "ajwajwa");
 
     if (!token) {
       token = cookies['jwt'] as string;
@@ -77,7 +78,26 @@ export class IsOwnerMiddleware implements NestMiddleware<Request, Response> {
       throw new HttpException('User not found', 404);
     }
 
-    if (user.id !== loggedInUser.id && loggedInUser.role !== 'admin' && loggedInUser.role !== 'superAdmin') {
+    if (user.id !== loggedInUser.id && loggedInUser.role !== 'superAdmin') {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    next();
+  }
+}
+
+@Injectable()
+export class IsAdminMiddleware implements NestMiddleware<Request, Response> {
+  constructor(private prismaService: PrismaService) { }
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    const loggedInUser = req.user;
+
+    if (!loggedInUser) {
+      throw new HttpException('Unauthorized', 401);
+    }
+
+    if (loggedInUser.role !== 'admin' && loggedInUser.role !== 'superAdmin') {
       throw new HttpException('Forbidden', 403);
     }
 

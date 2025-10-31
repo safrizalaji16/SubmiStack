@@ -25,7 +25,7 @@ export class AuthService {
         });
 
         if (existingUser) {
-            throw new HttpException('email or name already exists', 400);
+            throw new HttpException('email already exists', 400);
         }
 
         const createdUser = await this.prismaService.user.create({
@@ -52,7 +52,7 @@ export class AuthService {
         });
 
         if (!user) {
-            throw new HttpException('User not found', 404);
+            throw new HttpException('Invalid credentials', 401);
         }
 
         const isPasswordMatch = await comparePassword(loginUserDto.password, user.password);
@@ -64,6 +64,40 @@ export class AuthService {
         const token = generateToken(user, this.configService);
 
         delete user.password;
+
+        return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+            token: token,
+        };
+    }
+
+    async adminLogin(loginUserDto: LoginUserDto): Promise<LoginRes> {
+        this.logger.debug(`Login user ${JSON.stringify(loginUserDto)}`);
+
+        const user = await this.prismaService.user.findUnique({
+            where: { email: loginUserDto.email },
+        });
+
+        if (!user) {
+            throw new HttpException('User not found', 404);
+        }
+
+        if (user.role !== Role.admin && user.role !== Role.superAdmin) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const isPasswordMatch = await comparePassword(loginUserDto.password, user.password);
+
+        if (!isPasswordMatch) {
+            throw new HttpException('Invalid credentials', 401);
+        }
+
+        const token = generateToken(user, this.configService);
 
         return {
             id: user.id,

@@ -28,7 +28,6 @@ export class UserDto {
 
   @ApiProperty({
     enum: Role,
-    isArray: true,
     default: Role.user,
   })
   role: Role;
@@ -64,7 +63,6 @@ export class UpdateUserDto extends PartialType(UserDto) {
 
   @ApiProperty({
     enum: Role,
-    isArray: true,
     default: Role.user,
   })
   role: Role;

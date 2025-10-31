@@ -7,9 +7,15 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: true,
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
+
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   const configService = app.get(ConfigService);
 
@@ -23,6 +29,7 @@ async function bootstrap() {
     .addTag('Auth')
     .addTag('User')
     .addTag('Submission')
+    .addTag('Submission Log')
     .addTag('File')
     .build();
 
