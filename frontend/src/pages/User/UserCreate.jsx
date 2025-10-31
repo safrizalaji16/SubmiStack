@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 import { alertError, alertSuccess } from "../../libs/alert";
-import { createUser } from "../../services/UserApi";
+import { create } from "../../services/UserApi";
 
 export default function UserCreate() {
     const navigate = useNavigate();
@@ -9,7 +9,7 @@ export default function UserCreate() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("user"); // default role
+    const [role, setRole] = useState("user");
 
     const reset = () => {
         setName("");
@@ -21,7 +21,7 @@ export default function UserCreate() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        const response = await createUser({ name, email, password, role });
+        const response = await create({ name, email, password, role });
         const data = await response.json();
 
         if (data.errors === null) {
