@@ -26,12 +26,12 @@ export class AppModule implements NestModule {
         { path: '/api/auth/login', method: RequestMethod.POST },
         { path: '/api/auth/register', method: RequestMethod.POST },
         { path: '/api/auth/logout', method: RequestMethod.GET },
+        { path: '/api/auth/admin/login', method: RequestMethod.POST },
       )
       .forRoutes('/api/*');
     consumer
       .apply(IsAdminMiddleware)
       .forRoutes(
-        { path: '/api/auth/admin/login', method: RequestMethod.DELETE },
         { path: '/api/users', method: RequestMethod.GET },
         { path: '/api/users', method: RequestMethod.POST },
         { path: '/api/users', method: RequestMethod.DELETE },

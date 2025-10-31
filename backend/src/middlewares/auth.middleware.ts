@@ -14,7 +14,6 @@ export class AuthMiddleware
   async use(req: Request, res: Response, next: (error?: any) => void) {
     const cookies = req.cookies;
     let token = cookies['JWT'] as string;
-    console.log(cookies, token, "ajwajwa");
 
     if (!token) {
       token = cookies['jwt'] as string;

@@ -2,7 +2,7 @@ import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { Action } from '@prisma/client';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
-import { CreateSubmissionDto, UpdateSubmissionDto } from 'src/dto/request/submission.dto';
+import { CreateSubmissionDto, SubmissionQuery, UpdateSubmissionDto } from 'src/dto/request/submission.dto';
 import { SubmissionDto } from 'src/dto/response/submission.dto';
 import { Logger } from 'winston';
 
@@ -13,10 +13,24 @@ export class SubmissionService {
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger
   ) { }
 
-  async findAll(): Promise<SubmissionDto[]> {
+  async findAll(query: SubmissionQuery): Promise<SubmissionDto[]> {
     this.logger.info('Finding all submissions');
 
-    return this.prismaService.submission.findMany({ include: { user: true, image: true } });
+    const whereClause = {};
+
+    if (query.name) {
+      whereClause['name'] = { contains: query.name };
+    }
+
+    if (query.email) {
+      whereClause['email'] = { contains: query.email };
+    }
+
+    if (query.phone) {
+      whereClause['phone'] = { contains: query.phone };
+    }
+
+    return this.prismaService.submission.findMany({ where: whereClause, include: { user: true, image: true } });
   }
 
   async findOne(id: string): Promise<SubmissionDto> {
