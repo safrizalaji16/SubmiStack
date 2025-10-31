@@ -16,7 +16,9 @@ export class SubmissionService {
   async findAll(query: SubmissionQuery): Promise<SubmissionDto[]> {
     this.logger.info('Finding all submissions');
 
-    const whereClause = {};
+    const whereClause = {
+      userId: query.userId
+    };
 
     if (query.name) {
       whereClause['name'] = { contains: query.name };

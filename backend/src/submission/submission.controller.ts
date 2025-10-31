@@ -34,7 +34,12 @@ export class SubmissionController {
       }
     }
   })
-  async findAll(@Query() query: SubmissionQuery): Promise<ResponseDto<SubmissionDto[]>> {
+  async findAll(
+    @Req() req: Request,
+    @Query() query: SubmissionQuery
+  ): Promise<ResponseDto<SubmissionDto[]>> {
+    query.userId = req.user.id
+
     const submissions = await this.submissionService.findAll(query);
 
     return {
