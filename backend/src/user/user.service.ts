@@ -14,17 +14,19 @@ export class UserService {
   async getUsers(query: UserQuery): Promise<UserDto[]> {
     this.logger.debug(`Get users`);
 
-    const whereClause = {};
+    const whereClause: any = {};
 
+    // 🔍 Filter pencarian (by name / email)
     if (query.search) {
-      whereClause['OR'] = [
-        { name: { contains: query.search } },
-        { email: { contains: query.search } },
+      whereClause.OR = [
+        { name: { contains: query.search, mode: 'insensitive' } },
+        { email: { contains: query.search, mode: 'insensitive' } },
       ];
     }
 
+    // 🧩 Filter berdasarkan role (jika ada)
     if (query.role) {
-      whereClause['role'] = { in: query.role };
+      whereClause.role = query.role;
     }
 
     const users = await this.prismaService.user.findMany({
@@ -36,10 +38,11 @@ export class UserService {
         role: true,
         createdAt: true,
         updatedAt: true,
-      }
+      },
+      orderBy: { createdAt: 'desc' },
     });
 
-    if (!users.length) {
+    if (!users || users.length === 0) {
       throw new HttpException('No users found', 404);
     }
 

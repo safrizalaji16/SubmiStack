@@ -42,8 +42,6 @@ export class UserController {
     }
   })
   async getUsers(@Query() query: UserQuery): Promise<ResponseDto<UserDto[]>> {
-    query.role = Array.isArray(query.role) ? query.role : [query.role];
-
     const users = await this.userService.getUsers(query);
     return {
       message: 'Users fetched successfully',
