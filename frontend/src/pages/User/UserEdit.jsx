@@ -27,7 +27,7 @@ export default function UserEdit() {
             if (data.errors === null) {
                 await alertSuccess(data.message);
                 reset();
-                navigate("/dashboard/users");
+                navigate("/cms/users");
             } else {
                 await alertError(data.errors);
             }

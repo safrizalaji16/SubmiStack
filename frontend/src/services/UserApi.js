@@ -1,16 +1,14 @@
-export const getAllUsers = async (roles = ['admin', 'superAdmin', 'user'], search = '') => {
-    if (!Array.isArray(roles)) {
-        roles = typeof roles === 'string'
-            ? roles.split(',').map(r => r.trim())
-            : ['admin', 'superAdmin', 'user'];
-    }
+export const getAllUsers = async (query = {}) => {
+    const queryString = new URLSearchParams(query).toString();
 
-    const params = new URLSearchParams();
-    roles.forEach(r => params.append('role', r));
-    if (search) params.append('search', search);
+    const url = `${import.meta.env.VITE_API_URL}/users${queryString ? `?${queryString}` : ''}`;
 
-    return await fetch(`${import.meta.env.VITE_API_URL}/users?${params}`, {
+    return await fetch(url, {
+        method: 'GET',
         credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
     });
 };
 

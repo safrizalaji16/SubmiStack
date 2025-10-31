@@ -34,12 +34,12 @@ export class UserDto {
 }
 
 export class UserQuery {
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: Role,
     isArray: true,
-    default: [Role.user],
+    default: Role.user,
   })
-  role?: Role[];
+  role?: string;
 
   @ApiPropertyOptional({
     type: String,
