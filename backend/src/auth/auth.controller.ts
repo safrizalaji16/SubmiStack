@@ -156,8 +156,23 @@ export class AuthController {
             },
         },
     })
-    async adminLogin(@Body() loginUserDto: LoginUserDto) {
-        return this.authService.login(loginUserDto);
+    async adminLogin(
+        @Res({ passthrough: true }) res: Response,
+        @Body() loginUserDto: LoginUserDto
+    ) {
+        const user = await this.authService.adminLogin(loginUserDto);
+
+        res.cookie('JWT', user.token, {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/',
+        });
+
+        return {
+            message: 'User logged in successfully',
+            data: user,
+            errors: null
+        }
     }
 
     @Get('/logout')

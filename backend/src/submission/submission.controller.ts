@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Req, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Req, Put, Query } from '@nestjs/common';
 import { SubmissionService } from './submission.service';
-import { CreateSubmissionDto, UpdateSubmissionDto } from 'src/dto/request/submission.dto';
+import { CreateSubmissionDto, SubmissionQuery, UpdateSubmissionDto } from 'src/dto/request/submission.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ResponseDto } from 'src/dto/response/response.dto';
@@ -34,8 +34,8 @@ export class SubmissionController {
       }
     }
   })
-  async findAll(): Promise<ResponseDto<SubmissionDto[]>> {
-    const submissions = await this.submissionService.findAll();
+  async findAll(@Query() query: SubmissionQuery): Promise<ResponseDto<SubmissionDto[]>> {
+    const submissions = await this.submissionService.findAll(query);
 
     return {
       message: 'Submissions fetched successfully',

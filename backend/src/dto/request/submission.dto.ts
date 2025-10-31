@@ -35,9 +35,21 @@ export class CreateSubmissionDto {
 export class SubmissionQuery {
     @ApiPropertyOptional({
         type: String,
-        default: 'test',
+        default: 'test'
     })
-    search?: string;
+    name?: string
+
+    @ApiPropertyOptional({
+        type: String,
+        default: 'test@mail.com'
+    })
+    email?: string
+
+    @ApiPropertyOptional({
+        type: String,
+        default: '0123456789'
+    })
+    phone?: string
 }
 
 export class UpdateSubmissionDto extends PartialType(CreateSubmissionDto) {

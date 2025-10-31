@@ -15,7 +15,7 @@ export class SubmissionLogService {
     async findAll(): Promise<SubmissionLogDto[]> {
         this.logger.info('Finding all submission logs');
 
-        return this.prismaService.submissionLog.findMany({ include: { submission: true } });
+        return this.prismaService.submissionLog.findMany();
     }
 
     async create(createSubmissionLogDto: CreateSubmissionLogDto): Promise<SubmissionLogDto> {

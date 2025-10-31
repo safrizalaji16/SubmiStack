@@ -1,10 +1,13 @@
-export const upload = async (data) => {
+export const upload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
     return await fetch(`${import.meta.env.VITE_API_URL}/files/uploads`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: formData
     })
 }
