@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { alertError, alertSuccess } from "../../libs/alert"
-import { register } from "../../libs/api/AuthApi"
+import { register } from "../../services/AuthApi"
 import { Link, useNavigate } from "react-router"
 
 export default function AuthRegister() {
@@ -35,7 +35,7 @@ export default function AuthRegister() {
                 <div className="inline-block p-3 bg-gradient rounded-full mb-4">
                     <i className="fas fa-user-plus text-3xl text-white" />
                 </div>
-                <h1 className="text-3xl font-bold text-white">Contact Management</h1>
+                <h1 className="text-3xl font-bold text-white">Submission Management</h1>
                 <p className="text-gray-300 mt-2">Create a new account</p>
             </div>
             <form onSubmit={handleSubmit}>

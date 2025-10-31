@@ -9,7 +9,7 @@ export default function DashboardLayout() {
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <Link to="/dashboard/submissions" className="flex items-center hover:opacity-90 transition-opacity duration-200">
                         <i className="fas fa-address-book text-white text-2xl mr-3" />
-                        <div className="text-white font-bold text-xl">Contact Management</div>
+                        <div className="text-white font-bold text-xl">Submission Management</div>
                     </Link>
                     <nav>
                         <ul className="flex space-x-6">
@@ -32,7 +32,7 @@ export default function DashboardLayout() {
             <main className="container mx-auto px-4 py-8 flex-grow">
                 <Outlet />
                 <div className="mt-10 mb-6 text-center text-gray-400 text-sm animate-fade-in">
-                    <p>© 2025 Contact Management. All rights reserved.</p>
+                    <p>© 2025 Submission Management. All rights reserved.</p>
                 </div>
             </main>
         </div>

@@ -1,21 +1,23 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
-import { logout } from "../../libs/api/AuthApi"
-import { useLocalStorage } from "react-use"
+import { logout } from "../../services/AuthApi"
 import { alertError, alertSuccess } from "../../libs/alert"
+import { useLocalStorage } from "react-use";
+import Cookies from "js-cookie";
 
 export default function AuthLogout() {
+    const [, , removeToken] = useLocalStorage("token");
+    const [, , removeRole] = useLocalStorage("role");
     const navigate = useNavigate()
-
-    const [token, setToken] = useLocalStorage("token", null)
 
     async function handleLogout() {
         const response = await logout()
         const data = await response.json()
-        console.log(data, "awhj");
 
         if (data.errors === null) {
-            setToken(null)
+            Cookies.remove();
+            removeToken();
+            removeRole();
             await alertSuccess(data.message)
             navigate("/login")
         } else {

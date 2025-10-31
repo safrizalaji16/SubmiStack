@@ -1,15 +1,15 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router"
-import { login } from "../../libs/api/AuthApi"
+import { login } from "../../services/AuthApi"
 import { alertError, alertSuccess } from "../../libs/alert"
 import { useLocalStorage } from "react-use"
 
 export default function AuthLogin() {
     const navigate = useNavigate()
 
+    const [token, setToken] = useLocalStorage("token", "");
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [token, setToken] = useLocalStorage("token", "")
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -34,7 +34,7 @@ export default function AuthLogin() {
                 <div className="inline-block p-3 bg-gradient rounded-full mb-4">
                     <i className="fas fa-address-book text-3xl text-white" />
                 </div>
-                <h1 className="text-3xl font-bold text-white">Contact Management</h1>
+                <h1 className="text-3xl font-bold text-white">Submission Management</h1>
                 <p className="text-gray-300 mt-2">Sign in to your account</p>
             </div>
             <form onSubmit={handleSubmit}>

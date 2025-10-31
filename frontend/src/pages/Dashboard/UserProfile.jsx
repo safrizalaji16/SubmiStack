@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router"
-import { me } from "../../libs/api/AuthApi"
+import { me } from "../../services/AuthApi"
 import { useEffectOnce } from "react-use"
 import { useState } from "react"
-import { update } from "../../libs/api/UserApi"
+import { update } from "../../services/UserApi"
 import { alertError, alertSuccess } from "../../libs/alert"
 
 export default function UserProfile() {
