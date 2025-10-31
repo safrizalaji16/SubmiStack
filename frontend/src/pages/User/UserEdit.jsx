@@ -9,7 +9,7 @@ export default function UserEdit() {
     const { id } = useParams();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [role, setRole] = useState("user"); // default
+    const [role, setRole] = useState("user");
 
     const reset = () => {
         setName("");
@@ -63,7 +63,7 @@ export default function UserEdit() {
         <div>
             <div className="flex items-center mb-6">
                 <Link
-                    to="/dashboard/users"
+                    to="/cms/users"
                     className="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200"
                 >
                     <i className="fas fa-arrow-left mr-2" /> Back to Users
@@ -146,7 +146,7 @@ export default function UserEdit() {
                         {/* Buttons */}
                         <div className="flex justify-end space-x-4">
                             <Link
-                                to="/dashboard/users"
+                                to="/cms/users"
                                 className="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md"
                             >
                                 <i className="fas fa-times mr-2" /> Cancel
