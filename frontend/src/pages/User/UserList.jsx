@@ -91,10 +91,20 @@ export default function UserList() {
 
     return (
         <div>
-            <div className="flex items-center mb-6">
-                <i className="fas fa-user-cog text-blue-400 text-2xl mr-3" />
-                <h1 className="text-2xl font-bold text-white">Manage Users</h1>
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                    <i className="fas fa-user-cog text-blue-400 text-2xl mr-3" />
+                    <h1 className="text-2xl font-bold text-white">Manage Users</h1>
+                </div>
+
+                <Link
+                    to="/cms/users/create"
+                    className="flex items-center px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:ring-2 focus:ring-blue-500 font-medium shadow-lg transition-all duration-200"
+                >
+                    <i className="fas fa-user-plus mr-2" /> Create User
+                </Link>
             </div>
+
 
             {/* Search form */}
             <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-6 mb-8 animate-fade-in">
