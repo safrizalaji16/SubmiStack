@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { getAll, getAll as getSubmissions } from "../../services/SubmissionApi";
+import { getAll as getSubmissions } from "../../services/SubmissionApi";
 import { alertError } from "../../libs/alert";
 import { getAllUsers } from "../../services/UserApi";
 
@@ -12,32 +12,33 @@ export default function AdminDashboard() {
 
     async function fetchStats() {
         try {
-            const responseSubmisions = await getAll();
-            const dataSubmisions = await responseSubmisions.json();
+            // Ambil submissions
+            const responseSubmissions = await getSubmissions();
+            const dataSubmissions = await responseSubmissions.json();
 
-            if (dataSubmisions.errors === null) {
-                setStats({
-                    ...stats,
-                    totalSubmissions: dataSubmisions.data.length,
-                });
+            if (!dataSubmissions.errors) {
+                setStats(prev => ({
+                    ...prev,
+                    totalSubmissions: dataSubmissions.data?.length || 0,
+                }));
             } else {
-                await alertError(dataSubmisions.errors);
+                await alertError(dataSubmissions.errors);
             }
 
-            const responseUsers = await getAllUsers({ role: ['admin', 'superAdmin', 'user'] });
+            // Ambil users
+            const responseUsers = await getAllUsers();
             const dataUsers = await responseUsers.json();
 
-            if (dataUsers.errors === null) {
-                setStats({
-                    ...stats,
-                    totalUsers: dataUsers.data.length,
-                });
+            if (!dataUsers.errors) {
+                setStats(prev => ({
+                    ...prev,
+                    totalUsers: dataUsers.data?.length || 0,
+                }));
             } else {
                 await alertError(dataUsers.errors);
             }
         } catch (error) {
-            console.log(error);
-
+            console.error(error);
             await alertError("Failed to fetch admin stats.");
         }
     }
@@ -71,7 +72,7 @@ export default function AdminDashboard() {
             {/* Manage Users */}
             <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-6 text-center animate-fade-in hover:scale-[1.02] transition-all duration-200">
                 <Link
-                    to="/dashboard/users"
+                    to="/cms/users"
                     className="flex flex-col items-center justify-center"
                 >
                     <i className="fas fa-user-cog text-yellow-400 text-4xl mb-3" />

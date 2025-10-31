@@ -5,48 +5,51 @@ import { alertError, alertSuccess, confirm } from "../../libs/alert";
 import { Link } from "react-router";
 
 export default function UserList() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [search, setSearch] = useState('');
+    const [role, setRole] = useState('');
     const [users, setUsers] = useState([]);
 
     async function handleSearch(e) {
         e.preventDefault();
-        fetchUsers();
+        fetchUsers({ search, role });
     }
 
     async function handleReset(e) {
         e.preventDefault();
-        setName('');
-        setEmail('');
+        setSearch('');
+        setRole('');
         fetchUsers();
     }
 
-    async function fetchUsers() {
-        const response = await getAllUsers();
-        const data = await response.json();
+    async function fetchUsers(query = {}) {
+        try {
+            const response = await getAllUsers(query);
+            const data = await response.json();
 
-        if (data.errors === null) {
-            setUsers(data.data);
-        } else {
-            await alertError(data.errors);
+            if (!data.errors) {
+                setUsers(data.data);
+            } else {
+                await alertError(data.errors);
+            }
+        } catch (error) {
+            await alertError("Failed to fetch users.");
         }
     }
 
     async function handleDelete(id) {
         const result = await confirm("Are you sure you want to delete this user?");
-
         if (result.isConfirmed) {
             try {
                 const response = await remove(id);
                 const data = await response.json();
 
-                if (data.errors === null) {
+                if (!data.errors) {
                     await alertSuccess(data.message);
                     fetchUsers();
                 } else {
                     await alertError(data.errors);
                 }
-            } catch (err) {
+            } catch {
                 await alertError("Failed to delete user.");
             }
         }
@@ -57,36 +60,28 @@ export default function UserList() {
         const searchFormContent = document.getElementById('searchFormContent');
         const toggleIcon = document.getElementById('toggleSearchIcon');
 
-        // Animasi buka/tutup form pencarian
-        searchFormContent.style.transition = 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, margin 0.3s ease-in-out';
+        // Animasi buka/tutup form
+        searchFormContent.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
         searchFormContent.style.overflow = 'hidden';
         searchFormContent.style.maxHeight = '0px';
         searchFormContent.style.opacity = '0';
-        searchFormContent.style.marginTop = '0';
 
         function toggleSearchForm() {
             if (searchFormContent.style.maxHeight !== '0px') {
                 searchFormContent.style.maxHeight = '0px';
                 searchFormContent.style.opacity = '0';
-                searchFormContent.style.marginTop = '0';
-                toggleIcon.classList.remove('fa-chevron-up');
-                toggleIcon.classList.add('fa-chevron-down');
+                toggleIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
             } else {
                 searchFormContent.style.maxHeight = searchFormContent.scrollHeight + 'px';
                 searchFormContent.style.opacity = '1';
-                searchFormContent.style.marginTop = '1rem';
-                toggleIcon.classList.remove('fa-chevron-down');
-                toggleIcon.classList.add('fa-chevron-up');
+                toggleIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
             }
         }
 
         toggleButton.addEventListener('click', toggleSearchForm);
-
         fetchUsers();
 
-        return () => {
-            toggleButton.removeEventListener('click', toggleSearchForm);
-        };
+        return () => toggleButton.removeEventListener('click', toggleSearchForm);
     });
 
     return (
@@ -105,52 +100,61 @@ export default function UserList() {
                 </Link>
             </div>
 
-
-            {/* Search form */}
+            {/* Search Form */}
             <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-6 mb-8 animate-fade-in">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
                         <i className="fas fa-search text-blue-400 mr-3" />
                         <h2 className="text-xl font-semibold text-white">Search Users</h2>
                     </div>
-                    <button type="button" id="toggleSearchForm" className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-full focus:outline-none transition-all duration-200">
+                    <button
+                        type="button"
+                        id="toggleSearchForm"
+                        className="text-gray-300 hover:text-white hover:bg-gray-700 p-2 rounded-full focus:outline-none transition-all duration-200"
+                    >
                         <i className="fas fa-chevron-down text-lg" id="toggleSearchIcon" />
                     </button>
                 </div>
+
                 <div id="searchFormContent" className="mt-4">
                     <form onSubmit={handleSearch}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label htmlFor="search_name" className="block text-gray-300 text-sm font-medium mb-2">Name</label>
+                                <label htmlFor="search" className="block text-gray-300 text-sm font-medium mb-2">
+                                    Name or Email
+                                </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i className="fas fa-user text-gray-500" />
+                                        <i className="fas fa-search text-gray-500" />
                                     </div>
                                     <input
                                         type="text"
-                                        id="search_name"
+                                        id="search"
                                         className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                        placeholder="Search by name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Search by name or email"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label htmlFor="search_email" className="block text-gray-300 text-sm font-medium mb-2">Email</label>
+                                <label htmlFor="role" className="block text-gray-300 text-sm font-medium mb-2">Role</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i className="fas fa-envelope text-gray-500" />
+                                        <i className="fas fa-user-tag text-gray-500" />
                                     </div>
-                                    <input
-                                        type="text"
-                                        id="search_email"
+                                    <select
+                                        id="role"
                                         className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                        placeholder="Search by email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
+                                        value={role}
+                                        onChange={(e) => setRole(e.target.value)}
+                                    >
+                                        <option value="">All Roles</option>
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="superAdmin">Super Admin</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -175,19 +179,18 @@ export default function UserList() {
                 </div>
             </div>
 
-            {/* User cards */}
+            {/* User Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {users.map((user) => (
                     <div key={user.id} className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
                         <div className="p-6">
                             <h2 className="text-2xl font-semibold text-white mb-4">{user.name}</h2>
                             <p className="text-gray-300 mb-2">
-                                <i className="fas fa-envelope text-gray-500 mr-2" />
-                                {user.email}
+                                <i className="fas fa-envelope text-gray-500 mr-2" /> {user.email}
                             </p>
                             <p className="text-gray-300 mb-2">
                                 <i className="fas fa-user-tag text-gray-500 mr-2" />
-                                Role: <span className="capitalize">{user.role?.name || 'N/A'}</span>
+                                Role: <span className="capitalize">{user.role || 'N/A'}</span>
                             </p>
 
                             <div className="mt-5 flex justify-end space-x-3">
