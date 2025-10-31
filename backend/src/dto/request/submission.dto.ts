@@ -35,6 +35,12 @@ export class CreateSubmissionDto {
 export class SubmissionQuery {
     @ApiPropertyOptional({
         type: String,
+        default: '00000000-0000-0000-0000-000000000000',
+    })
+    userId?: string
+
+    @ApiPropertyOptional({
+        type: String,
         default: 'test'
     })
     name?: string
