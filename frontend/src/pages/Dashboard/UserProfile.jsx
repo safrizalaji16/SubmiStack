@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router"
 import { me } from "../../services/AuthApi"
 import { useEffectOnce } from "react-use"
 import { useState } from "react"
@@ -6,33 +5,45 @@ import { update } from "../../services/UserApi"
 import { alertError, alertSuccess } from "../../libs/alert"
 
 export default function UserProfile() {
-    const navigate = useNavigate()
-
+    const { setLoading } = useOutletContext();
     const [user, setUser] = useState({})
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
 
     async function fetchUserDetail() {
-        const response = await me()
-        const data = await response.json()
+        try {
+            setLoading(true)
+            const response = await me()
+            const data = await response.json()
 
-        if (data.errors === null) {
-            setUser(data.data)
+            if (data.errors === null) {
+                setUser(data.data)
+            }
+        } catch (error) {
+            await alertError("Failed to fetch user data.");
+        } finally {
+            setLoading(false)
         }
     }
 
     async function handleSubmitUpdateProfile(e) {
         e.preventDefault()
-        console.log(user.id);
 
-        const response = await update(user.id, { name: user.name, email: user.email })
-        const data = await response.json()
+        try {
+            setLoading(true)
+            const response = await update(user.id, { name: user.name, email: user.email })
+            const data = await response.json()
 
-        if (data.errors === null) {
-            await alertSuccess(data.message)
-        } else {
-            await alertError(data.errors)
-            return
+            if (data.errors === null) {
+                await alertSuccess(data.message)
+            } else {
+                await alertError(data.errors)
+                return
+            }
+        } catch (error) {
+            await alertError("Failed to update profile. Please try again later.")
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -46,18 +57,25 @@ export default function UserProfile() {
             return
         }
 
-        const response = await update(user.id, { password })
-        const data = await response.json()
+        try {
+            setLoading(true)
+            const response = await update(user.id, { password })
+            const data = await response.json()
 
-        if (data.errors === null) {
-            setPassword("")
-            setConfirmPassword("")
-            await alertSuccess(data.message)
-        } else {
-            setPassword("")
-            setConfirmPassword("")
-            await alertError(data.errors)
-            return
+            if (data.errors === null) {
+                setPassword("")
+                setConfirmPassword("")
+                await alertSuccess(data.message)
+            } else {
+                setPassword("")
+                setConfirmPassword("")
+                await alertError(data.errors)
+                return
+            }
+        } catch (error) {
+            await alertError("Failed to change password. Please try again later.")
+        } finally {
+            setLoading(false)
         }
     }
 

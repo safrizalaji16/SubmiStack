@@ -1,29 +1,35 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router"
+import { Link, useNavigate, useOutletContext } from "react-router"
 import { login } from "../../services/AuthApi"
 import { alertError, alertSuccess } from "../../libs/alert"
 import { useLocalStorage } from "react-use"
 
 export default function AuthLogin() {
     const navigate = useNavigate()
-
+    const { setLoading } = useOutletContext();
     const [token, setToken] = useLocalStorage("token", "");
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
     async function handleSubmit(e) {
         e.preventDefault()
+        try {
+            setLoading(true)
+            const response = await login({ email, password })
+            const data = await response.json()
 
-        const response = await login({ email, password })
-        const data = await response.json()
-
-        if (data.errors === null) {
-            setToken(data.data.token)
-            await alertSuccess(data.message)
-            await navigate("/dashboard/submissions")
-        } else {
-            await alertError(data.errors)
-            return
+            if (data.errors === null) {
+                setToken(data.data.token)
+                await alertSuccess(data.message)
+                await navigate("/dashboard/submissions")
+            } else {
+                await alertError(data.errors)
+                return
+            }
+        } catch (error) {
+            await alertError("Server error, please try again later.")
+        } finally {
+            setLoading(false)
         }
     }
 

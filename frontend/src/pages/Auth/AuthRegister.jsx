@@ -1,14 +1,15 @@
 import { useState } from "react"
 import { alertError, alertSuccess } from "../../libs/alert"
 import { register } from "../../services/AuthApi"
-import { Link, useNavigate } from "react-router"
+import { Link, useNavigate, useOutletContext } from "react-router"
 
 export default function AuthRegister() {
+    const navigate = useNavigate()
+    const { setLoading } = useOutletContext();
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -18,15 +19,22 @@ export default function AuthRegister() {
             return
         }
 
-        const response = await register({ name, email, password })
-        const data = await response.json()
+        try {
+            setLoading(true)
+            const response = await register({ name, email, password })
+            const data = await response.json()
 
-        if (data.errors === null) {
-            await alertSuccess(data.message)
-            await navigate("/login")
-        } else {
-            await alertError(data.errors)
-            return
+            if (data.errors === null) {
+                await alertSuccess(data.message)
+                await navigate("/login")
+            } else {
+                await alertError(data.errors)
+                return
+            }
+        } catch (error) {
+            await alertError("Server error, please try again later.")
+        } finally {
+            setLoading(false)
         }
     }
     return (

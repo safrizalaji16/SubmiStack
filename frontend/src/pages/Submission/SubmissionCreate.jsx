@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useOutletContext } from "react-router";
 import { useState } from "react";
 import { upload } from "../../services/FileApi";
 import { alertError, alertSuccess } from "../../libs/alert";
@@ -7,6 +7,7 @@ import ModalPreview from "../../components/ModalPreview";
 
 export default function SubmissionCreate() {
     const navigate = useNavigate()
+    const { setLoading } = useOutletContext();
     const [imagePreview, setImagePreview] = useState(null);
     const [image, setImage] = useState(null);
     const [name, setName] = useState("");
@@ -37,27 +38,33 @@ export default function SubmissionCreate() {
 
     async function handleSubmit(e) {
         e.preventDefault()
+        try {
+            setLoading(true)
+            const responseUpload = await upload(image)
+            const dataUpload = await responseUpload.json()
 
-        const responseUpload = await upload(image)
-        const dataUpload = await responseUpload.json()
+            if (dataUpload.errors === null) {
+                const response = await create({ name, email, phone, imageId: dataUpload.data.id })
+                const data = await response.json()
 
-        if (dataUpload.errors === null) {
-            const response = await create({ name, email, phone, imageId: dataUpload.data.id })
-            const data = await response.json()
-
-            if (data.errors === null) {
-                reset()
-                await alertSuccess(data.message)
-                navigate("/dashboard/submissions")
+                if (data.errors === null) {
+                    reset()
+                    await alertSuccess(data.message)
+                    navigate("/dashboard/submissions")
+                } else {
+                    reset()
+                    await alertError(data.errors)
+                    return
+                }
             } else {
                 reset()
-                await alertError(data.errors)
+                await alertError(dataUpload.errors)
                 return
             }
-        } else {
-            reset()
-            await alertError(dataUpload.errors)
-            return
+        } catch (error) {
+            await alertError("Failed to create submission. Please try again later.")
+        } finally {
+            setLoading(false)
         }
     }
 

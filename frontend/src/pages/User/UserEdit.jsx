@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useOutletContext, useParams } from "react-router";
 import { useState } from "react";
 import { useEffectOnce } from "react-use";
 import { get, update } from "../../services/UserApi";
@@ -6,6 +6,7 @@ import { alertError, alertSuccess } from "../../libs/alert";
 
 export default function UserEdit() {
     const navigate = useNavigate();
+    const { setLoading } = useOutletContext();
     const { id } = useParams();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ export default function UserEdit() {
         e.preventDefault();
 
         try {
+            setLoading(true);
             const response = await update(id, { name, email, role });
             const data = await response.json();
 
@@ -34,11 +36,14 @@ export default function UserEdit() {
         } catch (error) {
             console.error(error);
             await alertError("Failed to update user. Please try again later.");
+        } finally {
+            setLoading(false);
         }
     }
 
     async function fetchUser() {
         try {
+            setLoading(true);
             const response = await get(id);
             const data = await response.json();
 
@@ -52,6 +57,8 @@ export default function UserEdit() {
         } catch (error) {
             console.error(error);
             await alertError("Failed to fetch user data.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -76,7 +83,6 @@ export default function UserEdit() {
             <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in">
                 <div className="p-8">
                     <form onSubmit={handleSubmit}>
-                        {/* Name */}
                         <div className="mb-5">
                             <label htmlFor="name" className="block text-gray-300 text-sm font-medium mb-2">
                                 Name
@@ -98,7 +104,6 @@ export default function UserEdit() {
                             </div>
                         </div>
 
-                        {/* Email */}
                         <div className="mb-5">
                             <label htmlFor="email" className="block text-gray-300 text-sm font-medium mb-2">
                                 Email
@@ -120,7 +125,6 @@ export default function UserEdit() {
                             </div>
                         </div>
 
-                        {/* Role */}
                         <div className="mb-6">
                             <label htmlFor="role" className="block text-gray-300 text-sm font-medium mb-2">
                                 Role
@@ -143,7 +147,6 @@ export default function UserEdit() {
                             </div>
                         </div>
 
-                        {/* Buttons */}
                         <div className="flex justify-end space-x-4">
                             <Link
                                 to="/cms/users"

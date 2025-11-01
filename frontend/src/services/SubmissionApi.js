@@ -1,3 +1,19 @@
+export const getAllByUser = async ({ name, email, phone } = {}) => {
+    const url = new URL(`${import.meta.env.VITE_API_URL}/submissions/user`);
+
+    if (name) url.searchParams.set('name', name);
+    if (email) url.searchParams.set('email', email);
+    if (phone) url.searchParams.set('phone', phone);
+
+    return await fetch(url, {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    });
+};
+
 export const getAll = async ({ name, email, phone } = {}) => {
     const url = new URL(`${import.meta.env.VITE_API_URL}/submissions`);
 

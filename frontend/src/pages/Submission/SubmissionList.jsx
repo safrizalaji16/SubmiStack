@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useEffectOnce } from "react-use";
-import { getAll, remove } from "../../services/SubmissionApi";
-import { Link } from "react-router";
+import { getAllByUser, remove } from "../../services/SubmissionApi";
+import { Link, useOutletContext } from "react-router";
 import { alertError, alertSuccess, confirm } from "../../libs/alert";
 import ModalPreview from "../../components/ModalPreview";
 
 export default function SubmissionList() {
+    const { setLoading } = useOutletContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
@@ -26,13 +27,20 @@ export default function SubmissionList() {
     }
 
     async function fetchSubmissions() {
-        const response = await getAll({ name, email, phone });
-        const data = await response.json();
+        try {
+            setLoading(true);
+            const response = await getAllByUser({ name, email, phone });
+            const data = await response.json();
 
-        if (data.errors === null) {
-            setSubmissions(data.data);
-        } else {
-            await alertError(data.errors);
+            if (data.errors === null) {
+                setSubmissions(data.data);
+            } else {
+                await alertError(data.errors);
+            }
+        } catch (error) {
+            await alertError("Failed to fetch submissions.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -41,6 +49,7 @@ export default function SubmissionList() {
 
         if (result.isConfirmed) {
             try {
+                setLoading(true);
                 const response = await remove(id);
                 const data = await response.json();
 
@@ -52,6 +61,8 @@ export default function SubmissionList() {
                 }
             } catch (err) {
                 await alertError("Failed to delete submission.");
+            } finally {
+                setLoading(false);
             }
         }
     }
@@ -178,7 +189,7 @@ export default function SubmissionList() {
                         <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in transition-all duration-300 hover:scale-[1.01]">
                             <div className="p-6">
                                 <Link
-                                    href={`/detail/${submission.name}`}
+                                    to={`/dashboard/submissions/${submission.id}`}
                                     className="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
                                 >
                                     <h2 className="text-2xl font-semibold text-white hover:text-blue-300 transition-colors duration-200 mb-4">

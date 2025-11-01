@@ -1,7 +1,10 @@
 import { Link, Outlet, useLocation } from "react-router";
+import { useState } from "react";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function CmsLayout() {
     const location = useLocation();
+    const [loading, setLoading] = useState(false);
 
     const navItems = [
         { path: "/cms/dashboard", label: "Dashboard", icon: "fas fa-tachometer-alt" },
@@ -9,7 +12,9 @@ export default function CmsLayout() {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-gray-800 text-gray-100">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-900 to-gray-800 text-gray-100 relative">
+            <LoadingOverlay loading={loading} />
+
             <header className="bg-slate-800/90 backdrop-blur border-b border-gray-700 shadow-lg">
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
                     <Link
@@ -52,11 +57,11 @@ export default function CmsLayout() {
             </header>
 
             <main className="flex-grow container mx-auto px-6 py-8">
-                <Outlet />
+                <Outlet context={{ setLoading }} />
             </main>
 
             <footer className="text-center text-gray-500 text-sm py-6 border-t border-gray-700">
-                <p>© {new Date().getFullYear()} CMS Management System — Admin Panel</p>
+                <p>© 2025 CMS Management System — Admin Panel</p>
             </footer>
         </div>
     );
