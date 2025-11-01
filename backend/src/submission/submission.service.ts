@@ -16,6 +16,26 @@ export class SubmissionService {
   async findAll(query: SubmissionQuery): Promise<SubmissionDto[]> {
     this.logger.info('Finding all submissions');
 
+    const whereClause = {};
+
+    if (query.name) {
+      whereClause['name'] = { contains: query.name };
+    }
+
+    if (query.email) {
+      whereClause['email'] = { contains: query.email };
+    }
+
+    if (query.phone) {
+      whereClause['phone'] = { contains: query.phone };
+    }
+
+    return this.prismaService.submission.findMany({ where: whereClause, include: { user: true, image: true } });
+  }
+
+  async findAllByUser(query: SubmissionQuery): Promise<SubmissionDto[]> {
+    this.logger.info('Finding all by user submissions');
+
     const whereClause = {
       userId: query.userId
     };

@@ -69,7 +69,6 @@ function App() {
         }
       />
 
-      {/* Rute khusus admin */}
       <Route
         path="/cms"
         element={

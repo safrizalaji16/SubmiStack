@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
 import { alertError, alertSuccess } from "../../libs/alert";
@@ -10,6 +10,12 @@ export default function AdminLogin() {
     const [role, setRole] = useLocalStorage("role", "");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    useEffect(() => {
+        if (token) {
+            navigate("/cms/dashboard");
+        }
+    }, [token, navigate]);
 
     async function handleSubmit(e) {
         e.preventDefault();

@@ -48,6 +48,44 @@ export class SubmissionController {
       errors: null
     }
   }
+  
+  @Get('/user')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Get all submissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'The submissions have been successfully fetched.',
+    schema: {
+      example: {
+        message: 'Submissions fetched successfully',
+        data: [
+          {
+            id: '00000000-0000-0000-0000-000000000000',
+            name: 'test',
+            email: 'test@mail.com',
+            role: 'string',
+            createdAt: '2024-09-30T13:01:33.011Z',
+            updatedAt: '2024-09-30T13:01:33.011Z',
+          },
+        ],
+        errors: null,
+      }
+    }
+  })
+  async findAllByUser(
+    @Req() req: Request,
+    @Query() query: SubmissionQuery
+  ): Promise<ResponseDto<SubmissionDto[]>> {
+    query.userId = req.user.id
+
+    const submissions = await this.submissionService.findAllByUser(query);
+
+    return {
+      message: 'Submissions fetched successfully',
+      data: submissions,
+      errors: null
+    }
+  }
 
   @Get('/:id')
   @HttpCode(200)

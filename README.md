@@ -15,6 +15,8 @@
 - [Project Structure](#-project-structure)
 - [Installation](#-installation)
 - [API Documentation](#-api-documentation)
+- [Frontend Routes](#-frontend-routes)
+- [API Endpoints](#-api-endpoints)
 - [Database Schema](#-database-schema)
 - [Roles & Permissions](#-roles--permissions)
 - [Development Scripts](#-development-scripts)
@@ -194,6 +196,41 @@ Swagger UI is automatically generated and available at:
 http://localhost:3000/api#/
 ```
 
+## 🌐 Frontend Routes
+
+### Public Routes
+
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/` | Redirect | Redirects to `/dashboard` (authenticated) or `/login` (guest) |
+| `/register` | AuthRegister | User registration page |
+| `/login` | AuthLogin | User login page |
+| `/logout` | AuthLogout | Logout handler |
+
+### User Dashboard Routes (Protected)
+
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/dashboard` | DashboardLayout | Main dashboard layout |
+| `/dashboard/users/profile` | UserProfile | User profile page |
+| `/dashboard/submissions` | SubmissionList | List all submissions |
+| `/dashboard/submissions/create` | SubmissionCreate | Create new submission |
+| `/dashboard/submissions/:id` | SubmissionEdit | Edit submission by ID |
+
+### Admin CMS Routes (Admin Only)
+
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/cms/login` | AdminLogin | Admin login page |
+| `/cms` | Redirect | Redirects to `/cms/dashboard` or `/cms/login` |
+| `/cms/dashboard` | AdminDashboard | Admin dashboard |
+| `/cms/users` | UserList | Manage all users |
+| `/cms/users/create` | UserCreate | Create new user |
+| `/cms/users/:id` | UserEdit | Edit user by ID |
+| `/unauthorized` | Unauthorized | Access denied page |
+
+## 🔌 API Endpoints
+
 ### Authentication Endpoints
 
 | Method | Endpoint | Description | Auth Required |
@@ -223,6 +260,7 @@ http://localhost:3000/api#/
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | GET | `/api/submissions` | Get all submissions | ✅ |
+| GET | `/api/submissions/user` | Get submissions by current user | ✅ |
 | POST | `/api/submissions` | Create submission | ✅ |
 | GET | `/api/submissions/{id}` | Get submission by ID | ✅ |
 | PUT | `/api/submissions/{id}` | Update submission | ✅ |
