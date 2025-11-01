@@ -189,7 +189,7 @@ export default function SubmissionList() {
                         <div className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in transition-all duration-300 hover:scale-[1.01]">
                             <div className="p-6">
                                 <Link
-                                    href={`/detail/${submission.name}`}
+                                    to={`/dashboard/submissions/${submission.id}`}
                                     className="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3"
                                 >
                                     <h2 className="text-2xl font-semibold text-white hover:text-blue-300 transition-colors duration-200 mb-4">

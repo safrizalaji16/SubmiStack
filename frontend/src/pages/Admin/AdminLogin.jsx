@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useNavigate } from "react-router";
 import { useLocalStorage } from "react-use";
 import { alertError, alertSuccess } from "../../libs/alert";
 import { adminLogin } from "../../services/AuthApi";
 
 export default function AdminLogin() {
     const navigate = useNavigate();
-    const { setLoading } = useOutletContext();
     const [token, setToken] = useLocalStorage("token", "");
     const [role, setRole] = useLocalStorage("role", "");
     const [email, setEmail] = useState("");
@@ -16,7 +15,6 @@ export default function AdminLogin() {
         e.preventDefault();
 
         try {
-            setLoading(true);
             const response = await adminLogin({ email, password });
             const data = await response.json();
 
@@ -30,8 +28,6 @@ export default function AdminLogin() {
             }
         } catch (err) {
             await alertError("Server error, please try again later.");
-        } finally {
-            setLoading(false);
         }
     }
 

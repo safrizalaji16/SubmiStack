@@ -10,6 +10,9 @@ export default function UserList() {
     const [role, setRole] = useState('');
     const [users, setUsers] = useState([]);
 
+    const userRole = localStorage.getItem('role');
+    const isSuperAdmin = userRole == `"superAdmin"`;
+
     async function handleSearch(e) {
         e.preventDefault();
         fetchUsers({ search, role });
@@ -41,6 +44,12 @@ export default function UserList() {
     }
 
     async function handleDelete(id) {
+        // Block jika bukan super admin
+        if (!isSuperAdmin) {
+            await alertError("Only Super Admin can delete users.");
+            return;
+        }
+
         const result = await confirm("Are you sure you want to delete this user?");
         if (result.isConfirmed) {
             try {
@@ -67,7 +76,6 @@ export default function UserList() {
         const searchFormContent = document.getElementById('searchFormContent');
         const toggleIcon = document.getElementById('toggleSearchIcon');
 
-        // Animasi buka/tutup form
         searchFormContent.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
         searchFormContent.style.overflow = 'hidden';
         searchFormContent.style.maxHeight = '0px';
@@ -189,7 +197,10 @@ export default function UserList() {
             {/* User Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {users.map((user) => (
-                    <div key={user.id} className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
+                    <div
+                        key={user.id}
+                        className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in"
+                    >
                         <div className="p-6">
                             <h2 className="text-2xl font-semibold text-white mb-4">{user.name}</h2>
                             <p className="text-gray-300 mb-2">
@@ -207,12 +218,24 @@ export default function UserList() {
                                 >
                                     <i className="fas fa-edit mr-2" /> Edit
                                 </Link>
-                                <button
-                                    onClick={() => handleDelete(user.id)}
-                                    className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:ring-2 focus:ring-red-500 font-medium shadow-md flex items-center"
-                                >
-                                    <i className="fas fa-trash-alt mr-2" /> Delete
-                                </button>
+
+                                {/* Conditional Delete Button */}
+                                {isSuperAdmin ? (
+                                    <button
+                                        onClick={() => handleDelete(user.id)}
+                                        className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:ring-2 focus:ring-red-500 font-medium shadow-md flex items-center"
+                                    >
+                                        <i className="fas fa-trash-alt mr-2" /> Delete
+                                    </button>
+                                ) : (
+                                    <button
+                                        disabled
+                                        className="px-4 py-2 bg-gray-600 text-gray-400 rounded-lg cursor-not-allowed font-medium shadow-md flex items-center opacity-50"
+                                        title="Only Super Admin can delete users"
+                                    >
+                                        <i className="fas fa-lock mr-2" /> Delete
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
