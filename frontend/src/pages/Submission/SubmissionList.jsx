@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useEffectOnce } from "react-use";
-import { getAll, remove } from "../../services/SubmissionApi";
-import { Link } from "react-router";
+import { getAllByUser, remove } from "../../services/SubmissionApi";
+import { Link, useOutletContext } from "react-router";
 import { alertError, alertSuccess, confirm } from "../../libs/alert";
 import ModalPreview from "../../components/ModalPreview";
 
 export default function SubmissionList() {
+    const { setLoading } = useOutletContext();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
@@ -26,13 +27,20 @@ export default function SubmissionList() {
     }
 
     async function fetchSubmissions() {
-        const response = await getAll({ name, email, phone });
-        const data = await response.json();
+        try {
+            setLoading(true);
+            const response = await getAllByUser({ name, email, phone });
+            const data = await response.json();
 
-        if (data.errors === null) {
-            setSubmissions(data.data);
-        } else {
-            await alertError(data.errors);
+            if (data.errors === null) {
+                setSubmissions(data.data);
+            } else {
+                await alertError(data.errors);
+            }
+        } catch (error) {
+            await alertError("Failed to fetch submissions.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -41,6 +49,7 @@ export default function SubmissionList() {
 
         if (result.isConfirmed) {
             try {
+                setLoading(true);
                 const response = await remove(id);
                 const data = await response.json();
 
@@ -52,6 +61,8 @@ export default function SubmissionList() {
                 }
             } catch (err) {
                 await alertError("Failed to delete submission.");
+            } finally {
+                setLoading(false);
             }
         }
     }

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router";
+import { Link, useOutletContext } from "react-router";
 import { getAll as getSubmissions } from "../../services/SubmissionApi";
 import { alertError } from "../../libs/alert";
 import { getAllUsers } from "../../services/UserApi";
 
 export default function AdminDashboard() {
+    const { setLoading } = useOutletContext();
     const [stats, setStats] = useState({
         totalSubmissions: 0,
         totalUsers: 0,
@@ -12,7 +13,8 @@ export default function AdminDashboard() {
 
     async function fetchStats() {
         try {
-            // Ambil submissions
+            setLoading(true);
+            
             const responseSubmissions = await getSubmissions();
             const dataSubmissions = await responseSubmissions.json();
 
@@ -25,7 +27,6 @@ export default function AdminDashboard() {
                 await alertError(dataSubmissions.errors);
             }
 
-            // Ambil users
             const responseUsers = await getAllUsers();
             const dataUsers = await responseUsers.json();
 
@@ -40,6 +41,8 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error(error);
             await alertError("Failed to fetch admin stats.");
+        } finally {
+            setLoading(false);
         }
     }
 

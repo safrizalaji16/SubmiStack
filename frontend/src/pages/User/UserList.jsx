@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useEffectOnce } from "react-use";
 import { getAllUsers, remove } from "../../services/UserApi";
 import { alertError, alertSuccess, confirm } from "../../libs/alert";
-import { Link } from "react-router";
+import { Link, useOutletContext } from "react-router";
 
 export default function UserList() {
+    const { setLoading } = useOutletContext();
     const [search, setSearch] = useState('');
     const [role, setRole] = useState('');
     const [users, setUsers] = useState([]);
@@ -23,6 +24,7 @@ export default function UserList() {
 
     async function fetchUsers(query = {}) {
         try {
+            setLoading(true);
             const response = await getAllUsers(query);
             const data = await response.json();
 
@@ -33,6 +35,8 @@ export default function UserList() {
             }
         } catch (error) {
             await alertError("Failed to fetch users.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -40,6 +44,7 @@ export default function UserList() {
         const result = await confirm("Are you sure you want to delete this user?");
         if (result.isConfirmed) {
             try {
+                setLoading(true);
                 const response = await remove(id);
                 const data = await response.json();
 
@@ -51,6 +56,8 @@ export default function UserList() {
                 }
             } catch {
                 await alertError("Failed to delete user.");
+            } finally {
+                setLoading(false);
             }
         }
     }

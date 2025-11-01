@@ -1,11 +1,11 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useOutletContext } from "react-router";
 import { useState } from "react";
 import { alertError, alertSuccess } from "../../libs/alert";
 import { create } from "../../services/UserApi";
 
 export default function UserCreate() {
     const navigate = useNavigate();
-
+    const { setLoading } = useOutletContext();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,16 +20,22 @@ export default function UserCreate() {
 
     async function handleSubmit(e) {
         e.preventDefault();
+        try {
+            setLoading(true);
+            const response = await create({ name, email, password, role });
+            const data = await response.json();
 
-        const response = await create({ name, email, password, role });
-        const data = await response.json();
-
-        if (data.errors === null) {
-            reset();
-            await alertSuccess(data.message || "User created successfully!");
-            navigate("/cms/users");
-        } else {
-            await alertError(data.errors);
+            if (data.errors === null) {
+                reset();
+                await alertSuccess(data.message || "User created successfully!");
+                navigate("/cms/users");
+            } else {
+                await alertError(data.errors);
+            }
+        } catch (error) {
+            await alertError("Failed to create user. Please try again later.");
+        } finally {
+            setLoading(false);
         }
     }
 

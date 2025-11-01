@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useOutletContext, useParams } from "react-router";
 import { useState } from "react";
 import { upload } from "../../services/FileApi";
 import { alertError, alertSuccess } from "../../libs/alert";
@@ -8,6 +8,7 @@ import ModalPreview from "../../components/ModalPreview";
 
 export default function SubmissionEdit() {
     const navigate = useNavigate();
+    const { setLoading } = useOutletContext();
     const { id } = useParams();
     const [imagePreview, setImagePreview] = useState(null);
     const [image, setImage] = useState(null);
@@ -41,6 +42,7 @@ export default function SubmissionEdit() {
         e.preventDefault();
 
         try {
+            setLoading(true);
             let imageId = originalImageId;
 
             if (image) {
@@ -68,11 +70,14 @@ export default function SubmissionEdit() {
         } catch (error) {
             console.error(error);
             await alertError("Failed to update submission. Please try again later.");
+        } finally {
+            setLoading(false);
         }
     }
 
     async function fetchSubmission() {
         try {
+            setLoading(true);
             const response = await get(id);
             const data = await response.json();
 
@@ -88,6 +93,8 @@ export default function SubmissionEdit() {
         } catch (error) {
             console.error(error);
             await alertError("Failed to fetch submission data.");
+        } finally {
+            setLoading(false);
         }
     }
 
